@@ -1,0 +1,21 @@
+{
+  "name": "task_4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js" // Add this line
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
+    "typescript": "^3.6.4",
+    "webpack": "^5.91.0",         // Add this
+    "webpack-cli": "^5.1.4",      // Add this
+    "ts-loader": "^9.5.1"         // Add this
+  }
+}
