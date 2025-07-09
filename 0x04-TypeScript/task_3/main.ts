@@ -1,39 +1,43 @@
-// task_3/main.ts
+// task_8/main.ts
 
-// Interface for the printTeacher function
-interface printTeacherFunction {
-    (firstName: string, lastName: string): string;
-}
+// Triple slash directive to include the ambient declarations from crud.d.ts
+/// <reference path="./js/crud.d.ts" />
 
-// The printTeacher function implementation
-const printTeacher: printTeacherFunction = (firstName: string, lastName: string): string => {
-    // Get the first letter of the firstName and capitalize it
-    const firstInitial = firstName.charAt(0).toUpperCase();
-    // Return the formatted string
-    return `${firstInitial}. ${lastName}`;
+// Import the RowID type and RowElement interface from interface.ts
+import { RowID, RowElement } from './interface';
+
+// Import everything from crud.js as CRUD
+// TypeScript will use the crud.d.ts declarations for this import
+import * as CRUD from './js/crud';
+
+// Create an object called row with the type RowElement
+const row: RowElement = {
+    firstName: "Guillaume",
+    lastName: "Salva"
 };
 
-// Example usage as requested
-const teacherName1 = printTeacher("John", "Doe");
-console.log(`printTeacher("John", "Doe") -> ${teacherName1}`); // Expected: J. Doe
+// Create a const variable named newRowID with the type RowID
+// and assign the value the insertRow command.
+const newRowID: RowID = CRUD.insertRow(row);
 
-const teacherName2 = printTeacher("alice", "smith");
-console.log(`printTeacher("alice", "smith") -> ${teacherName2}`); // Expected: A. smith
+// Create a const variable named updatedRow with the type RowElement
+// and update row with an age field set to 23
+const updatedRow: RowElement = { ...row, age: 23 }; // Using spread syntax to add/override properties
 
-const teacherName3 = printTeacher("bob", "MARLEY");
-console.log(`printTeacher("bob", "MARLEY") -> ${teacherName3}`); // Expected: B. MARLEY
-
+// Call the updateRow and deleteRow commands.
+CRUD.updateRow(newRowID, updatedRow);
+CRUD.deleteRow(newRowID); // Use newRowID for deletion as well
 
 // To ensure console.log output is easily viewable in the browser,
-// you can add a simple HTML structure.
+// you can add a simple HTML structure to display the results.
 document.addEventListener("DOMContentLoaded", () => {
     const outputDiv = document.createElement("div");
     outputDiv.innerHTML = `
-        <h1>Print Teacher Function Output</h1>
-        <p><code>printTeacher("John", "Doe")</code> -> <strong>${teacherName1}</strong></p>
-        <p><code>printTeacher("alice", "smith")</code> -> <strong>${teacherName2}</strong></p>
-        <p><code>printTeacher("bob", "MARLEY")</code> -> <strong>${teacherName3}</strong></p>
-        <p>Check the browser console for more detailed output.</p>
+        <h1>CRUD Operations Output</h1>
+        <p>Check the browser console for the output of insertRow, updateRow, and deleteRow operations.</p>
+        <p>Initial Row: <code>${JSON.stringify(row)}</code></p>
+        <p>New Row ID (from insertRow): <code>${newRowID}</code></p>
+        <p>Updated Row: <code>${JSON.stringify(updatedRow)}</code></p>
     `;
     document.body.appendChild(outputDiv);
 });

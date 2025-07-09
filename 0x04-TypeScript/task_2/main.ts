@@ -1,94 +1,37 @@
-// task_6/main.ts
+// task_7/main.ts
 
-// Re-using interfaces from previous tasks
-interface DirectorInterface {
-    workFromHome(): string;
-    getCoffeeBreak(): string;
-    workDirectorTasks(): string;
-}
+// Define the String literal type Subjects
+type Subjects = 'Math' | 'History';
 
-interface TeacherInterface {
-    workFromHome(): string;
-    getCoffeeBreak(): string;
-    workTeacherTasks(): string;
-}
-
-// Re-using classes from previous tasks
-class Director implements DirectorInterface {
-    workFromHome(): string {
-        return "Working from home";
-    }
-
-    getCoffeeBreak(): string {
-        return "Getting a coffee break";
-    }
-
-    workDirectorTasks(): string {
-        return "Getting to director tasks";
-    }
-}
-
-class Teacher implements TeacherInterface {
-    workFromHome(): string {
-        return "Cannot work from home";
-    }
-
-    getCoffeeBreak(): string {
-        return "Cannot have a break";
-    }
-
-    workTeacherTasks(): string {
-        return "Getting to work";
-    }
-}
-
-// Re-using createEmployee function from previous tasks
-function createEmployee(salary: number | string): Director | Teacher {
-    if (typeof salary === 'number' && salary < 500) {
-        return new Teacher();
-    }
-    return new Director();
-}
-
-// New function: isDirector (Type Predicate)
 /**
- * Type predicate to check if an employee is a Director.
- * @param employee The employee instance (Director or Teacher).
- * @returns True if the employee is a Director, false otherwise.
+ * Teaches a class based on the provided subject.
+ * @param todayClass The subject to be taught, either 'Math' or 'History'.
+ * @returns A string indicating which subject is being taught.
  */
-function isDirector(employee: Director | Teacher): employee is Director {
-    return employee instanceof Director;
-}
-
-// New function: executeWork
-/**
- * Executes the specific work task based on the employee's role.
- * @param employee The employee instance (Director or Teacher).
- * @returns The result of the work task.
- */
-function executeWork(employee: Director | Teacher): string {
-    if (isDirector(employee)) {
-        // If employee is a Director, TypeScript knows it has workDirectorTasks
-        return employee.workDirectorTasks();
-    } else {
-        // Otherwise, it must be a Teacher, and TypeScript knows it has workTeacherTasks
-        return employee.workTeacherTasks();
+function teachClass(todayClass: Subjects): string {
+    if (todayClass === 'Math') {
+        return 'Teaching Math';
+    } else if (todayClass === 'History') {
+        return 'Teaching History';
     }
+    // This part is technically unreachable due to the Subjects type,
+    // but good practice might include a fallback or error for robustness
+    // if the type system were ever bypassed (e.g., in plain JS).
+    // For strict TypeScript, this else is not needed as all cases are covered.
+    // However, if you wanted to be super explicit or handle future extensions:
+    // throw new Error(`Unknown subject: ${todayClass}`);
 }
 
 // Expected results:
-console.log("--- executeWork examples ---");
-const employeeA = createEmployee(200);
-const workA = executeWork(employeeA);
-console.log(`createEmployee(200) -> ${employeeA.constructor.name}: ${workA}`); // Expected: Getting to work
+console.log("--- teachClass examples ---");
+const mathClass = teachClass('Math');
+console.log(`teachClass('Math') -> ${mathClass}`); // Expected: Teaching Math
 
-const employeeB = createEmployee(1000);
-const workB = executeWork(employeeB);
-console.log(`createEmployee(1000) -> ${employeeB.constructor.name}: ${workB}`); // Expected: Getting to director tasks
+const historyClass = teachClass('History');
+console.log(`teachClass('History') -> ${historyClass}`); // Expected: Teaching History
 
-const employeeC = createEmployee('$300'); // This will return a Director
-const workC = executeWork(employeeC);
-console.log(`createEmployee('$300') -> ${employeeC.constructor.name}: ${workC}`); // Expected: Getting to director tasks
+// Example of what would happen if you tried to pass an invalid subject (TypeScript error):
+// teachClass('Physics'); // Error: Argument of type '"Physics"' is not assignable to parameter of type '"Math" | "History"'.
 
 
 // To ensure console.log output is easily viewable in the browser,
@@ -96,10 +39,9 @@ console.log(`createEmployee('$300') -> ${employeeC.constructor.name}: ${workC}`)
 document.addEventListener("DOMContentLoaded", () => {
     const outputDiv = document.createElement("div");
     outputDiv.innerHTML = `
-        <h1>Employee Work Execution</h1>
-        <p><strong>createEmployee(200)</strong> (a Teacher) work: <code>${workA}</code></p>
-        <p><strong>createEmployee(1000)</strong> (a Director) work: <code>${workB}</code></p>
-        <p><strong>createEmployee('$300')</strong> (a Director) work: <code>${workC}</code></p>
+        <h1>Class Teaching Examples</h1>
+        <p><code>teachClass('Math')</code>: <strong>${mathClass}</strong></p>
+        <p><code>teachClass('History')</code>: <strong>${historyClass}</strong></p>
         <p>Check the browser console for more detailed output.</p>
     `;
     document.body.appendChild(outputDiv);
