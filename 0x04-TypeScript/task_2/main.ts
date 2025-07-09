@@ -1,20 +1,19 @@
-// task_5/main.ts
+// task_6/main.ts
 
-// DirectorInterface
+// Re-using interfaces from previous tasks
 interface DirectorInterface {
     workFromHome(): string;
     getCoffeeBreak(): string;
     workDirectorTasks(): string;
 }
 
-// TeacherInterface
 interface TeacherInterface {
     workFromHome(): string;
     getCoffeeBreak(): string;
     workTeacherTasks(): string;
 }
 
-// Director Class
+// Re-using classes from previous tasks
 class Director implements DirectorInterface {
     workFromHome(): string {
         return "Working from home";
@@ -29,7 +28,6 @@ class Director implements DirectorInterface {
     }
 }
 
-// Teacher Class
 class Teacher implements TeacherInterface {
     workFromHome(): string {
         return "Cannot work from home";
@@ -44,51 +42,53 @@ class Teacher implements TeacherInterface {
     }
 }
 
-// createEmployee function
+// Re-using createEmployee function from previous tasks
 function createEmployee(salary: number | string): Director | Teacher {
-    // If salary is a number and less than 500, return a new Teacher
     if (typeof salary === 'number' && salary < 500) {
         return new Teacher();
     }
-    // Otherwise, return a Director
     return new Director();
 }
 
-// Expected result examples:
-console.log("--- createEmployee examples ---");
-const employee1 = createEmployee(200);
-console.log(`createEmployee(200) returns: ${employee1.constructor.name}`); // Expected: Teacher
-console.log(`  workFromHome: ${employee1.workFromHome()}`);
-console.log(`  getCoffeeBreak: ${employee1.getCoffeeBreak()}`);
-// Note: TypeScript will allow calling methods specific to Teacher or Director
-// if you use type guards, but for generic logging, we'll just show common ones.
-if (employee1 instanceof Teacher) {
-    console.log(`  workTeacherTasks: ${employee1.workTeacherTasks()}`);
-} else if (employee1 instanceof Director) {
-    console.log(`  workDirectorTasks: ${employee1.workDirectorTasks()}`);
+// New function: isDirector (Type Predicate)
+/**
+ * Type predicate to check if an employee is a Director.
+ * @param employee The employee instance (Director or Teacher).
+ * @returns True if the employee is a Director, false otherwise.
+ */
+function isDirector(employee: Director | Teacher): employee is Director {
+    return employee instanceof Director;
 }
 
-
-const employee2 = createEmployee(1000);
-console.log(`\ncreateEmployee(1000) returns: ${employee2.constructor.name}`); // Expected: Director
-console.log(`  workFromHome: ${employee2.workFromHome()}`);
-console.log(`  getCoffeeBreak: ${employee2.getCoffeeBreak()}`);
-if (employee2 instanceof Teacher) {
-    console.log(`  workTeacherTasks: ${employee2.workTeacherTasks()}`);
-} else if (employee2 instanceof Director) {
-    console.log(`  workDirectorTasks: ${employee2.workDirectorTasks()}`);
+// New function: executeWork
+/**
+ * Executes the specific work task based on the employee's role.
+ * @param employee The employee instance (Director or Teacher).
+ * @returns The result of the work task.
+ */
+function executeWork(employee: Director | Teacher): string {
+    if (isDirector(employee)) {
+        // If employee is a Director, TypeScript knows it has workDirectorTasks
+        return employee.workDirectorTasks();
+    } else {
+        // Otherwise, it must be a Teacher, and TypeScript knows it has workTeacherTasks
+        return employee.workTeacherTasks();
+    }
 }
 
+// Expected results:
+console.log("--- executeWork examples ---");
+const employeeA = createEmployee(200);
+const workA = executeWork(employeeA);
+console.log(`createEmployee(200) -> ${employeeA.constructor.name}: ${workA}`); // Expected: Getting to work
 
-const employee3 = createEmployee('$500');
-console.log(`\ncreateEmployee('$500') returns: ${employee3.constructor.name}`); // Expected: Director
-console.log(`  workFromHome: ${employee3.workFromHome()}`);
-console.log(`  getCoffeeBreak: ${employee3.getCoffeeBreak()}`);
-if (employee3 instanceof Teacher) {
-    console.log(`  workTeacherTasks: ${employee3.workTeacherTasks()}`);
-} else if (employee3 instanceof Director) {
-    console.log(`  workDirectorTasks: ${employee3.workDirectorTasks()}`);
-}
+const employeeB = createEmployee(1000);
+const workB = executeWork(employeeB);
+console.log(`createEmployee(1000) -> ${employeeB.constructor.name}: ${workB}`); // Expected: Getting to director tasks
+
+const employeeC = createEmployee('$300'); // This will return a Director
+const workC = executeWork(employeeC);
+console.log(`createEmployee('$300') -> ${employeeC.constructor.name}: ${workC}`); // Expected: Getting to director tasks
 
 
 // To ensure console.log output is easily viewable in the browser,
@@ -96,30 +96,10 @@ if (employee3 instanceof Teacher) {
 document.addEventListener("DOMContentLoaded", () => {
     const outputDiv = document.createElement("div");
     outputDiv.innerHTML = `
-        <h1>Employee Creation Examples</h1>
-        <p><strong>createEmployee(200)</strong> returns a <code>${employee1.constructor.name}</code>:</p>
-        <ul>
-            <li>Work from Home: ${employee1.workFromHome()}</li>
-            <li>Coffee Break: ${employee1.getCoffeeBreak()}</li>
-            ${employee1 instanceof Teacher ? `<li>Teacher Tasks: ${employee1.workTeacherTasks()}</li>` : ''}
-            ${employee1 instanceof Director ? `<li>Director Tasks: ${employee1.workDirectorTasks()}</li>` : ''}
-        </ul>
-
-        <p><strong>createEmployee(1000)</strong> returns a <code>${employee2.constructor.name}</code>:</p>
-        <ul>
-            <li>Work from Home: ${employee2.workFromHome()}</li>
-            <li>Coffee Break: ${employee2.getCoffeeBreak()}</li>
-            ${employee2 instanceof Teacher ? `<li>Teacher Tasks: ${employee2.workTeacherTasks()}</li>` : ''}
-            ${employee2 instanceof Director ? `<li>Director Tasks: ${employee2.workDirectorTasks()}</li>` : ''}
-        </ul>
-
-        <p><strong>createEmployee('$500')</strong> returns a <code>${employee3.constructor.name}</code>:</p>
-        <ul>
-            <li>Work from Home: ${employee3.workFromHome()}</li>
-            <li>Coffee Break: ${employee3.getCoffeeBreak()}</li>
-            ${employee3 instanceof Teacher ? `<li>Teacher Tasks: ${employee3.workTeacherTasks()}</li>` : ''}
-            ${employee3 instanceof Director ? `<li>Director Tasks: ${employee3.workDirectorTasks()}</li>` : ''}
-        </ul>
+        <h1>Employee Work Execution</h1>
+        <p><strong>createEmployee(200)</strong> (a Teacher) work: <code>${workA}</code></p>
+        <p><strong>createEmployee(1000)</strong> (a Director) work: <code>${workB}</code></p>
+        <p><strong>createEmployee('$300')</strong> (a Director) work: <code>${workC}</code></p>
         <p>Check the browser console for more detailed output.</p>
     `;
     document.body.appendChild(outputDiv);
